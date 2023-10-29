@@ -38,3 +38,4 @@ minetest.register_node(":facotirez:dev_nfd", {
 })
 
 dofile(mod_path.."/machines/header.lua")
+dofile(mod_path.."/pipes/header.lua")
