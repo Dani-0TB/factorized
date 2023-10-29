@@ -22,7 +22,7 @@ minetest.register_node(":facotrized:miner", {
     local meta = minetest.get_meta(pos)
     local is_on = meta:get_int("is_on")
 
-    meta:set_int("is_on", toggleOn(is_on))
+    meta:set_int("is_on", factorized.toggleOn(is_on))
 
     if (is_on == 0) then
       minetest.chat_send_all("Miner on")

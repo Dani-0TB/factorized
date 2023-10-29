@@ -11,6 +11,7 @@ end
 
 mod_path = minetest.get_modpath("factorized")
 
+-- Dev Blocks
 minetest.register_node(":facotirez:dev_fd", {
   description = "dev facedir",
   tiles = { "dev_ypos.png",
@@ -35,3 +36,5 @@ minetest.register_node(":facotirez:dev_nfd", {
           },
   groups = {oddly_breakable_by_hand = 3},
 })
+
+dofile(mod_path.."/machines/header.lua")
