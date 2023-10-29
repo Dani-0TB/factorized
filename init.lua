@@ -1,4 +1,15 @@
-dofile(minetest.get_modpath("factorized").."/machines/miner.lua")
+factorized = {}
+
+-- Toggle a boolean value
+factorized.toggleOn = function(boolean)
+  if boolean == 0 then
+    return 1
+  else
+    return 0
+  end
+end
+
+mod_path = minetest.get_modpath("factorized")
 
 minetest.register_node(":facotirez:dev_fd", {
   description = "dev facedir",
