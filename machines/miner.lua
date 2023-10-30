@@ -33,7 +33,7 @@ function miner.getNodeAtDepth(pos, miner)
   return minetest.get_node(nodePos)
 end
 
-function miner.setDillHead(pos, miner)
+function miner.setDrillHead(pos, miner)
   local nodePos = {x=pos.x, y=pos.y-miner.depth,z=pos.z}
   minetest.set_node(nodePos,{name="DrillHead"})
 end
@@ -114,7 +114,7 @@ minetest.register_node(":factorized:miner", {
       
       while nodeAtDepth.name == "air" or nodeAtDepth.name == "factorized:miner_drill_head" do
         if nodeAtDepth.name == "air" then
-          miner.setDillHead(pos, worldMiner)
+          miner.setDrillHead(pos, worldMiner)
           worldMiner.depth = worldMiner.depth + 1
         end
         if nodeAtDepth.name == "factorized:miner_drill_head" then
@@ -123,7 +123,7 @@ minetest.register_node(":factorized:miner", {
         nodeAtDepth = miner.getNodeAtDepth(pos, worldMiner)
       end
 
-      miner.setDillHead(pos, worldMiner)
+      miner.setDrillHead(pos, worldMiner)
       minetest.chat_send_all("Mined: "..nodeAtDepth.name)
       miner.updateMiner(pos, worldMiner)
       
