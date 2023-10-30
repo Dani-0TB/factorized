@@ -1,4 +1,77 @@
+
+
 miner = {}
+
+-- model
+function miner.createBlank()
+  local miner = {
+    depth = 0,
+    isOn = false
+  }
+  return miner
+end
+
+function miner.create(depth, isOn)
+  local miner = {
+    depth = depth,
+    isOn = isOn
+  }
+  return miner
+end
+
+function miner.toggleIsOn(miner)
+  miner.isOn = not miner.isOn
+  return miner
+end
+
+--controller
+
+
+--view
+function miner.getNodeAtDepth(pos, miner)
+  local nodePos = {x=pos.x, y=pos.y-miner.depth,z=pos.z}
+  return minetest.get_node(nodePos)
+end
+
+function miner.setDillHead(pos, miner)
+  local nodePos = {x=pos.x, y=pos.y-miner.depth,z=pos.z}
+  minetest.set_node(nodePos,{name="DrillHead"})
+end
+
+function miner.placeMiner(pos)
+  local newMiner = miner.createBlank()
+  local isOn = boolToNumber(newMiner.isOn)
+  local meta = minetest.get_meta(pos)
+  meta:set_int("depth", newMiner.depth)
+  meta:set_int("isOn", isOn)
+end
+
+function miner.getMiner(pos)
+  local meta = minetest.get_meta(pos)
+  local depth = meta:get_int("depth")
+  local isOn = meta:get_int("isOn")
+  return miner.create(depth, numberToBool(isOn))
+end
+
+function miner.updateMiner(pos, miner)
+  local isOn = boolToNumber(miner.isOn)
+  local meta = minetest.get_meta(pos)
+  meta:set_int("depth", miner.depth)
+  meta:set_int("isOn", isOn)
+end
+
+
+function numberToBool(number)
+  return not (number == 0)
+end
+
+function boolToNumber(bool)
+  if bool then
+    return 1
+  else
+    return 0
+  end
+end
 
 minetest.register_node(":factorized:miner", {
   description = "Mining Drill",
@@ -12,41 +85,50 @@ minetest.register_node(":factorized:miner", {
   groups = {oddly_breakable_by_hand = 3},
   is_ground_content=false,
   paramtype2 = "facedir",
-  on_construct = function(pos, node)
-    local meta = minetest.get_meta(pos)
-    meta:set_int("is_on", 0)
-    meta:set_int("depth", 1)
-    if (is_on == 0) then
-      minetest.chat_send_all("Miner on")
-    else
-      minetest.chat_send_all("Miner off")
-    end
+  on_construct = function(pos)
+    miner.placeMiner(pos)
   end,
   on_punch = function(pos,node,puncher,pointed_thing)
-    local meta = minetest.get_meta(pos)
-    local is_on = meta:get_int("is_on")
-    meta:set_int("is_on", factorized.toggleOn(is_on))
-    if (is_on == 0) then
+    local worldMiner = miner.getMiner(pos)
+    local newMiner = miner.toggleIsOn(worldMiner)
+    newMiner.depth = 0;
+    miner.updateMiner(pos, newMiner)
+    
+    if worldMiner.isOn then
+      minetest.chat_send_all("Miner is ON")
       local timer = minetest.get_node_timer(pos)
-      timer:start(5.0)
-      minetest.chat_send_all("Miner on")
-      
+      timer:start(2)
     else
-      minetest.chat_send_all("Miner off")
+
+      minetest.chat_send_all("Miner is OFF")
     end
   end,
   on_timer = function(pos)
-    local meta = minetest.get_meta(pos)
-    if (meta:get_int("is_on") == 0) then
-      return
-    end
-    local depth = meta:get_int("depth")
-    local drill_pos = {x = pos.x, y = pos.y - depth, z = pos.z}
-    minetest.set_node(drill_pos, {name="DrillHead"})
-    depth = depth + 1
-    meta:set_int("depth", depth)
     local timer = minetest.get_node_timer(pos)
-    timer:start(5.0)
+    local worldMiner = miner.getMiner(pos)
+    worldMiner.depth = 0;
+    if worldMiner.isOn then
+      --mining controller
+      worldMiner.depth = worldMiner.depth + 1
+      local nodeAtDepth = miner.getNodeAtDepth(pos, worldMiner)
+      
+      while nodeAtDepth.name == "air" or nodeAtDepth.name == "factorized:miner_drill_head" do
+        if nodeAtDepth.name == "air" then
+          miner.setDillHead(pos, worldMiner)
+          worldMiner.depth = worldMiner.depth + 1
+        end
+        if nodeAtDepth.name == "factorized:miner_drill_head" then
+          worldMiner.depth = worldMiner.depth + 1
+        end
+        nodeAtDepth = miner.getNodeAtDepth(pos, worldMiner)
+      end
+
+      miner.setDillHead(pos, worldMiner)
+      minetest.chat_send_all("Mined: "..nodeAtDepth.name)
+      miner.updateMiner(pos, worldMiner)
+      
+      timer:start(5.0)
+    end
   end
 })
 
