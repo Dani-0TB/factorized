@@ -5,8 +5,8 @@ minetest.register_node(":factorized:pipe_base", {
     drawtype = "nodebox",
     node_box = {
         type = "connected",
-        -- for every 'connect_x' it makes four planes depending on the direction
-        -- simmulating a square of four faces, aka, a tube
+        -- for every 'connect_x' it makes four planes depending on the
+        -- direction simmulating a square of four faces, aka, a tube
         connect_top     = {
             { 0.25, 0.5, 0.25,-0.25, 0.25, 0.25},
             { 0.25, 0.5, 0.25, 0.25, 0.25,-0.25},
@@ -43,7 +43,7 @@ minetest.register_node(":factorized:pipe_base", {
             {0.5,-0.25,-0.25, 0.25,-0.25, 0.25},
             {0.5,-0.25,-0.25, 0.25, 0.25,-0.25},
         },
-        -- for every 'disconnect_x' it makes a single plane for the axis it belongs
+        -- for every 'disconnect_x' it makes a single plane for the axis it belongs to
         disconnected_top    = {{ 0.25, 0.25, 0.25,-0.25, 0.25,-0.25}},
         disconnected_bottom = {{ 0.25,-0.25, 0.25,-0.25,-0.25,-0.25}},
         disconnected_front  = {{-0.25, 0.25,-0.25, 0.25,-0.25,-0.25}},
